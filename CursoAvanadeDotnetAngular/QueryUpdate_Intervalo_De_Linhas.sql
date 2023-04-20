@@ -1,0 +1,1 @@
+update alunos set idTurma = 2 where id in (2,3);

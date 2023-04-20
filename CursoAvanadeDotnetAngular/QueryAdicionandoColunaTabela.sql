@@ -1,0 +1,1 @@
+ALTER TABLE Alunos ADD idTurma int
