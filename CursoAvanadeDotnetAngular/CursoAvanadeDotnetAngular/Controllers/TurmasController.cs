@@ -53,7 +53,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpGet]
-        [Route("/PorId")]
+        [Route("/[controller]/PorId")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -95,6 +95,38 @@ namespace CursoAvanadeDotnetAngular.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/[controller]/TurmaPorAluno/{Id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult TurmaPorAluno(int Id)
+        {
+            try
+            {
+                Entidade.Turma turmaEntidade = _context.Turmas.FirstOrDefault(w => w.Id == Id);
+
+                if (turmaEntidade == null)
+                {
+                    return NoContent();
+                }
+
+                DTO.Turma turmaDto = new DTO.Turma()
+                {
+                    Id = turmaEntidade.Id,
+                    NomeTurma = turmaEntidade.NomeTurma.ToString()
+                };
+
+
+                return Ok(turmaDto);
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
         [Route("/Inserir")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
@@ -108,9 +140,9 @@ namespace CursoAvanadeDotnetAngular.Controllers
                 Entidade.Turma turmaEntidade = new Entidade.Turma()
                 {
                     NomeTurma = turmaEntrada.NomeTurma,
-                };
+            };
 
-
+                
                 // LIMPA QUALQUER ALTERAÇÃO EM MEMÓRIA QUE NÃO FOI SALVA
                 _context.ChangeTracker.Clear();
                 // INSERT 
@@ -161,6 +193,23 @@ namespace CursoAvanadeDotnetAngular.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpDelete]
+        [Route("/Deletar/{Id}")]
+        public IActionResult Deletar(int Id)
+        {
+            Entidade.Turma turmaEntidade = _context.Turmas.FirstOrDefault(turma => turma.Id == Id);
+            _context.ChangeTracker.Clear();
+            // INSERT 
+            _context.Turmas.Remove(turmaEntidade);
+            // COMMIT NA BASE DE DADOS
+            int linhasAfetadas = _context.SaveChanges();
+
+            return Ok(linhasAfetadas + $"\nTurma : {turmaEntidade.NomeTurma} foi excluída");
+        }
+
+        
+
 
     }
 }

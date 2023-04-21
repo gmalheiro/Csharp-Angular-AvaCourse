@@ -26,7 +26,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpGet]
-        [Route("/Buscar/{id}")]
+        [Route("/[controller]/Buscar/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
         public IActionResult Get(int id)
@@ -69,7 +69,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpGet]
-        [Route("/BuscarAdo")]
+        [Route("/[controller]/BuscarAdo")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Entidades.AlunosEntidades>))]
         public IActionResult BuscarAdo()
         {
@@ -97,6 +97,8 @@ namespace CursoAvanadeDotnetAngular.Controllers
                             Nome = Helper.TratarNulo<string>(leitor["Nome"]),
                             //Documento = leitor["Documento"]?.ToString() ?? "",
                             Documento = Helper.TratarNulo<string>(leitor["Documento"]),
+                            //Nascimento= DateOnly.Parse(Helper.TratarNulo<DateOnly>(leitor["Nascimento"])),
+                            //Nascimento = Helper.TratarNulo<DateOnly.ToString()>(leitor["Nascimento"]),
                             //IdTurma = (DBNull.Value.Equals(leitor["IdTurma"]) ? (int?)null : Convert.ToInt32(leitor["IdTurma"])) 
                             IdTurma = Helper.TratarNulo<int?>(leitor["IdTurma"])
                         });
@@ -107,7 +109,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpGet]
-        [Route("/BuscarValorComoReferencia")]
+        [Route("/[controller]/BuscarValorComoReferencia")]
         public IActionResult BuscarValorComoReferencia()
         {
             int numero1 = 1;
@@ -119,7 +121,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpGet]
-        [Route("/BuscarReferencia")]
+        [Route("/[controller]/BuscarReferencia")]
         public IActionResult BuscarReferencia()
         {
             MensagemRetornoNaoAutorizado mensagem = new MensagemRetornoNaoAutorizado()
@@ -133,7 +135,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpGet]
-        [Route("/BuscarDapper")]
+        [Route("/[controller]/BuscarDapper")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
         public IActionResult BuscarDapper()
@@ -147,9 +149,47 @@ namespace CursoAvanadeDotnetAngular.Controllers
             return Ok(lista);
         }
 
+        [HttpGet]
+        [Route("/[controller]/BuscarEntity")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
+        public IActionResult BuscarEntity()
+        {          
+
+            return Ok((from alunos in _context.Alunos
+                       select alunos).ToList());
+        }
 
         [HttpGet]
-        [Route("/BuscarDapper/{Id}")]
+        [Route("/[controller]/BuscarEntity/{Id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
+        public IActionResult BuscarEntity(int Id)
+        {
+
+            return Ok((from alunos in _context.Alunos
+                       where alunos.Id == Id 
+                       select alunos));
+        }
+
+        [HttpGet]
+        [Route("/[controller]/AlunosPorTurma/{IdTurma}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
+        public IActionResult AlunosPorTurma(int IdTurma)
+        {
+
+            return Ok((from alunos in _context.Alunos
+                       join turmas in _context.Turmas 
+                       on alunos.IdTurma equals turmas.Id
+                       select new DTO.AlunosTurma(){ 
+                           Nome = alunos.Nome, 
+                           Documento = alunos.Documento 
+                       }).ToList());
+        }
+
+        [HttpGet]
+        [Route("/[controller]/BuscarDapper/{Id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
         public IActionResult BuscarDapper(int Id)
@@ -170,7 +210,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpPost]
-        [Route("/Criar")]
+        [Route("/[controller]/Criar")]
         public async Task<ActionResult> Post(Entidades.AlunosEntidades alunosEntidades)
         {
             try
@@ -197,26 +237,35 @@ namespace CursoAvanadeDotnetAngular.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Update(DTO.Turma turmaEntrada)
+        public IActionResult Update(DTO.Aluno alunoEntrada)
         {
             try
             {
 
-                Entidade.Turma turmaEntidade = new Entidade.Turma()
-                {
-                    NomeTurma = turmaEntrada.NomeTurma,
-                    Id = turmaEntrada.Id,
-                };
+                Entidade.Aluno alunoEntidade = _context.Alunos.Where(aluno=> aluno.Id==alunoEntrada.Id).FirstOrDefault();
 
+                if (alunoEntrada.Nome != null && !String.IsNullOrWhiteSpace(alunoEntrada.Nome)) 
+                { 
+                    alunoEntidade.Nome = alunoEntrada.Nome;
+                }
 
-                // LIMPA QUALQUER ALTERAÇÃO EM MEMÓRIA QUE NÃO FOI SALVA
-                _context.ChangeTracker.Clear();
+                if (alunoEntrada.Documento != null || !String.IsNullOrEmpty(alunoEntrada.Documento))
+                    alunoEntidade.Documento = alunoEntrada.Documento;
+
+                if (alunoEntrada.IdTurma != null || alunoEntrada.IdTurma == 0)
+                    alunoEntidade.IdTurma = alunoEntrada.IdTurma;
+
+                if (alunoEntrada.Nascimento!= null)
+                    alunoEntidade.Nascimento = alunoEntrada.Nascimento;
+
+                    // LIMPA QUALQUER ALTERAÇÃO EM MEMÓRIA QUE NÃO FOI SALVA
+                    _context.ChangeTracker.Clear();
                 // INSERT 
-                _context.Turmas.Update(turmaEntidade);
+                _context.Alunos.Update(alunoEntidade);
                 // COMMIT NA BASE DE DADOS
                 _context.SaveChanges();
 
-                return Ok(turmaEntrada);
+                return Ok(alunoEntrada);
             }
             catch (Exception)
             {
@@ -226,7 +275,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpDelete]
-        [Route("/ApagarApenasUmAluno")]
+        [Route("/[controller]/ApagarApenasUmAluno")]
         public IActionResult Delete(int id)
         {
             return Ok();
@@ -235,7 +284,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpDelete]
-        [Route("/ApagarTodosOsAlunos")]
+        [Route("/[controller]/ApagarTodosOsAlunos")]
         public IActionResult Delete()
         {
             try
@@ -252,33 +301,33 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
 
-        //[HttpPatch]
-        //[Route("/AtualizarAlunoDataNascimentoDapper")]
-        //public IActionResult Patch(Aluno alunoParametro)
-        //{
-        //    string conexaoComOBanco = _configuration.GetConnectionString("Sql"); //Pega a string de conexão com o banco
+        [HttpPatch]
+        [Route("/[controller]/AtualizarAlunoDataNascimentoDapper")]
+        public IActionResult AtualizarAlunoDataNascimentoDapper(Entidades.AlunosEntidades alunoParametro)
+        {
+            string conexaoComOBanco = _configuration.GetConnectionString("Sql"); //Pega a string de conexão com o banco
 
-        //    var parametros = new DynamicParameters();
-        //    parametros.Add("@Id", alunoParametro.Id);
-        //    parametros.Add("@Nascimento", alunoParametro.Nascimento);
+            var parametros = new DynamicParameters();
+            parametros.Add("@Id", alunoParametro.Id);
+            parametros.Add("@Nascimento", alunoParametro.Nascimento);
 
-        //    using (SqlConnection conexao = new SqlConnection(conexaoComOBanco)) //Cria a conexão com o banco
-        //    {
-        //        // Validate if the record exists before updating
-        //        var aluno = conexao.QueryFirstOrDefault<AlunosEntidades>("SELECT * FROM Alunos WHERE Id = @Id", parametros);
-        //        if (aluno == null)
-        //        {
-        //            return NotFound(); // Return 404 Not Found if the record doesn't exist
-        //        }
+            using (SqlConnection conexao = new SqlConnection(conexaoComOBanco)) //Cria a conexão com o banco
+            {
+                // Validate if the record exists before updating
+                var aluno = conexao.QueryFirstOrDefault<Entidades.AlunosEntidades>("SELECT * FROM Alunos WHERE Id = @Id", parametros);
+                if (aluno == null)
+                {
+                    return NotFound(); // Return 404 Not Found if the record doesn't exist
+                }
 
-        //        string comando = "UPDATE Alunos SET Nascimento = @Nascimento  WHERE Id = @Id"; //Cria o comando SQL que será executado
-        //        conexao.Execute(comando, parametros); // Executa o comando SQL
+                string comando = "UPDATE Alunos SET Nascimento = @Nascimento  WHERE Id = @Id"; //Cria o comando SQL que será executado
+                conexao.Execute(comando, parametros); // Executa o comando SQL
 
-        //        aluno = conexao.QueryFirstOrDefault<AlunosEntidades>("SELECT * FROM Alunos WHERE Id = @Id", parametros); //Busca o registro atualizado no banco
+                aluno = conexao.QueryFirstOrDefault<Entidades.AlunosEntidades>("SELECT * FROM Alunos WHERE Id = @Id", parametros); //Busca o registro atualizado no banco
 
-        //        return Ok(aluno);
-        //    }
-        //}
+                return Ok(aluno);
+            }
+        }
 
 
 
@@ -291,7 +340,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
 
         [HttpGet]
-        [Route("/ListarEF")]
+        [Route("/[controller]/ListarEF")]
         public IActionResult ListarEF()
         {   
             return Ok(_context.Alunos.ToList());
@@ -321,6 +370,10 @@ namespace CursoAvanadeDotnetAngular.Controllers
             if (DBNull.Value.Equals(valor))
             {
                 return default(T);
+            }
+            else if (typeof(T) == typeof(DateOnly) && valor is DateTime dateTime)
+            {
+                return (T)(object)DateOnly.FromDateTime(dateTime);
             }
             else
             {
