@@ -35,6 +35,10 @@ public partial class CursoContexto : DbContext
             entity.Property(e => e.Nome)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.IdTurmaNavigation).WithMany(p => p.Alunos)
+                .HasForeignKey(d => d.IdTurma)
+                .HasConstraintName("FK_Alunos_Turmas");
         });
 
         modelBuilder.Entity<Turma>(entity =>

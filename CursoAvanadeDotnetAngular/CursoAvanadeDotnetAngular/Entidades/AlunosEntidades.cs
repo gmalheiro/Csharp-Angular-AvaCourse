@@ -7,6 +7,7 @@ namespace CursoAvanadeDotnetAngular.Entidades
         public int Id { get; set; }
         public string Nome { get; set; }
         public string Documento { get; set; }
+        public String? Nascimento { get; set; }
         public int? IdTurma { get; set; }
 
         public override string ToString()

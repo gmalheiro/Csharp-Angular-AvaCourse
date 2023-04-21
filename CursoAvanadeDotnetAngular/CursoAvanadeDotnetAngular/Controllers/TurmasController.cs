@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CursoAvanadeDotnetAngular.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Turmas")]
     [ApiController]
     public class TurmaController : ControllerBase
     {
@@ -94,5 +94,73 @@ namespace CursoAvanadeDotnetAngular.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpPost]
+        [Route("/Inserir")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Insert(DTO.Turma turmaEntrada)
+        {
+            try
+            {
+
+                Entidade.Turma turmaEntidade = new Entidade.Turma()
+                {
+                    NomeTurma = turmaEntrada.NomeTurma,
+                };
+
+
+                // LIMPA QUALQUER ALTERAÇÃO EM MEMÓRIA QUE NÃO FOI SALVA
+                _context.ChangeTracker.Clear();
+                // INSERT 
+                _context.Turmas.Add(turmaEntidade);
+                // COMMIT NA BASE DE DADOS
+                _context.SaveChanges();
+
+                turmaEntrada.Id = turmaEntidade.Id;
+
+                return Ok(turmaEntrada);
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        [Route("/Atualizar")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Update(DTO.Turma turmaEntrada)
+        {
+            try
+            {
+
+                Entidade.Turma turmaEntidade = new Entidade.Turma()
+                {
+                    NomeTurma = turmaEntrada.NomeTurma,
+                    Id = turmaEntrada.Id,
+                };
+
+
+                // LIMPA QUALQUER ALTERAÇÃO EM MEMÓRIA QUE NÃO FOI SALVA
+                _context.ChangeTracker.Clear();
+                // INSERT 
+                _context.Turmas.Update(turmaEntidade);
+                // COMMIT NA BASE DE DADOS
+                _context.SaveChanges();
+
+                return Ok(turmaEntrada);
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
+        }
+
     }
 }

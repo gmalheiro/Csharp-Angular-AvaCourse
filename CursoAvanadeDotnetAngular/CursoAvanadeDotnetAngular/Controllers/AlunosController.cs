@@ -11,7 +11,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CursoAvanadeDotnetAngular.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Alunos")]
     [ApiController]
     public class AlunosController : ControllerBase
     {
@@ -27,12 +27,12 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
         [HttpGet]
         [Route("/Buscar/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AlunosEntidades))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
         public IActionResult Get(int id)
         {
-            AlunosEntidades alunoEntidade =
-                new AlunosEntidades(); // Cria a lista que será retornada
+            Entidades.AlunosEntidades alunoEntidade =
+                new Entidades.AlunosEntidades(); // Cria a lista que será retornada
 
             string conexaoComOBanco = _configuration.GetConnectionString("Sql"); //Pega a string de conexão com o banco
 
@@ -52,7 +52,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
                     while (leitor.Read())
                     {
-                        alunoEntidade = new AlunosEntidades()
+                        alunoEntidade = new Entidades.AlunosEntidades()
                         {
                             Id = Convert.ToInt32(leitor["Id"]),
                             //Nome = leitor["Nome"]?.ToString() ?? "",
@@ -70,11 +70,11 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
         [HttpGet]
         [Route("/BuscarAdo")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AlunosEntidades>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Entidades.AlunosEntidades>))]
         public IActionResult BuscarAdo()
         {
-            List<AlunosEntidades> lista =
-                new List<AlunosEntidades>(); // Cria a lista que será retornada
+            List<Entidades.AlunosEntidades> lista =
+                new List<Entidades.AlunosEntidades>(); // Cria a lista que será retornada
 
             string conexaoComOBanco = _configuration.GetConnectionString("Sql"); //Pega a string de conexão com o banco
 
@@ -134,7 +134,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
         [HttpGet]
         [Route("/BuscarDapper")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AlunosEntidades))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
         public IActionResult BuscarDapper()
         {
@@ -142,7 +142,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
             SqlConnection conexao = new SqlConnection(conexaoComOBanco); //Cria a conexão com o banco
             string comando = "SELECT * FROM ALUNOS"; //Cria o comando SQL que será executado
-            List<AlunosEntidades> lista = conexao.Query<AlunosEntidades>(comando).ToList(); // Cria a lista que será retornada
+            List<Entidades.AlunosEntidades> lista = conexao.Query<Entidades.AlunosEntidades>(comando).ToList(); // Cria a lista que será retornada
 
             return Ok(lista);
         }
@@ -150,7 +150,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
         [HttpGet]
         [Route("/BuscarDapper/{Id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AlunosEntidades))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(String))]
         public IActionResult BuscarDapper(int Id)
         {
@@ -161,25 +161,27 @@ namespace CursoAvanadeDotnetAngular.Controllers
 
             SqlConnection conexao = new SqlConnection(conexaoComOBanco); //Cria a conexão com o banco
             string comando = "SELECT * FROM ALUNOS WHERE Id = @Id"; //Cria o comando SQL que será executado
-            AlunosEntidades aluno = conexao
-                                            .Query<AlunosEntidades>(comando, parametrosConsulta)
+            Entidades.AlunosEntidades aluno = conexao
+                                            .Query<Entidades.AlunosEntidades>(comando, parametrosConsulta)
                                             ?.FirstOrDefault()
-                                            ?? new AlunosEntidades(); // Cria o objeto que será retornada
+                                            ?? new Entidades.AlunosEntidades(); // Cria o objeto que será retornada
 
             return Ok(aluno);
         }
 
         [HttpPost]
         [Route("/Criar")]
-        public async Task<ActionResult> Post(AlunosEntidades alunosEntidades)
+        public async Task<ActionResult> Post(Entidades.AlunosEntidades alunosEntidades)
         {
             try
             {
                 SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Sql"));
                 int linhasAfetadas = connection.Execute(
                     "INSERT INTO [dbo].[Alunos]" +
-                    "([Nome],[Documento],[IdTurma])" +
-                    "VALUES (@Nome,@Documento,@IdTurma)", alunosEntidades);
+                    "([Nome],[Documento],[IdTurma],[Nascimento])" +
+                    "VALUES (@Nome,@Documento,@IdTurma,@Nascimento)", alunosEntidades);
+
+                //int IdCadastrado = connection.Query<int>("SELECT @@Identity").FirstOrDefault();
 
                 return Ok($"Linhas afetadas no banco de dados:{linhasAfetadas}\n" +
                           $"{alunosEntidades.ToString()}");
@@ -191,13 +193,36 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpPost]
-        [Route("/Atualizar")]
-        public IActionResult Post(int id)
+        [Route("/[controller]/Atualizar")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Entidades.AlunosEntidades))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Update(DTO.Turma turmaEntrada)
         {
-            //TODO: IMPLEMENTAR COM BASE NA CONTROLER X
-            return Ok();
-            //return NoContent();
-            //return NotFound();    
+            try
+            {
+
+                Entidade.Turma turmaEntidade = new Entidade.Turma()
+                {
+                    NomeTurma = turmaEntrada.NomeTurma,
+                    Id = turmaEntrada.Id,
+                };
+
+
+                // LIMPA QUALQUER ALTERAÇÃO EM MEMÓRIA QUE NÃO FOI SALVA
+                _context.ChangeTracker.Clear();
+                // INSERT 
+                _context.Turmas.Update(turmaEntidade);
+                // COMMIT NA BASE DE DADOS
+                _context.SaveChanges();
+
+                return Ok(turmaEntrada);
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
         }
 
         [HttpDelete]
