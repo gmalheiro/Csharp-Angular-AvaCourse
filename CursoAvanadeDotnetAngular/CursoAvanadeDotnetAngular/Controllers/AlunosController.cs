@@ -184,7 +184,7 @@ namespace CursoAvanadeDotnetAngular.Controllers
                        on alunos.IdTurma equals turmas.Id
                        select new DTO.AlunosTurma(){ 
                            Nome = alunos.Nome, 
-                           Documento = alunos.Documento 
+                           Documento = alunos.Documento
                        }).ToList());
         }
 

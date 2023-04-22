@@ -96,15 +96,27 @@ namespace CursoAvanadeDotnetAngular.Controllers
         }
 
         [HttpGet]
-        [Route("/[controller]/TurmaPorAluno/{Id}")]
+        [Route("/[controller]/TurmaPorAluno/{IdAluno}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult TurmaPorAluno(int Id)
+        public IActionResult TurmaPorAluno(int IdAluno)
         {
             try
             {
-                Entidade.Turma turmaEntidade = _context.Turmas.FirstOrDefault(w => w.Id == Id);
+                Entidade.Turma turmaEntidade = 
+                    _context.Turmas
+
+                    .Join(_context.Alunos,
+                    turma => turma.Id,
+                    aluno => aluno.IdTurma,
+                    (turma,aluno) => new { Turma = turma, Aluno = aluno})
+                    
+                    .Where(w => w.Aluno.Id == IdAluno)
+                    
+                    .Select(s=> s.Turma)
+                    
+                    .FirstOrDefault();
 
                 if (turmaEntidade == null)
                 {
