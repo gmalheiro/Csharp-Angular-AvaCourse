@@ -1,6 +1,7 @@
 ﻿using CursoAvanadeDotnetAngular.Contexto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CursoAvanadeDotnetAngular.Controllers
 {
@@ -73,50 +74,6 @@ namespace CursoAvanadeDotnetAngular.Controllers
                 //Maneira para caso não encontre o registro, retornar null(SEM UTILIZAR O FIRST OR DEFAULT)
                 //Entidade.Turma turmaEntidade = _context.Turmas.Where(w => w.Id == Id).FirstOrDefault(); // MANEIRA PARA ENCONTRAR UTILIZANDO O WHERE
                 Entidade.Turma turmaEntidade = _context.Turmas.FirstOrDefault(w => w.Id == Id);
-
-                if (turmaEntidade == null)
-                {
-                    return NoContent();
-                }
-
-                DTO.Turma turmaDto = new DTO.Turma()
-                {
-                    Id = turmaEntidade.Id,
-                    NomeTurma = turmaEntidade.NomeTurma.ToString()
-                };
-
-
-                return Ok(turmaDto);
-            }
-            catch (Exception)
-            {
-
-                return BadRequest();
-            }
-        }
-
-        [HttpGet]
-        [Route("/[controller]/TurmaPorAluno/{IdAluno}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult TurmaPorAluno(int IdAluno)
-        {
-            try
-            {
-                Entidade.Turma turmaEntidade = 
-                    _context.Turmas
-
-                    .Join(_context.Alunos,
-                    turma => turma.Id,
-                    aluno => aluno.IdTurma,
-                    (turma,aluno) => new { Turma = turma, Aluno = aluno})
-                    
-                    .Where(w => w.Aluno.Id == IdAluno)
-                    
-                    .Select(s=> s.Turma)
-                    
-                    .FirstOrDefault();
 
                 if (turmaEntidade == null)
                 {

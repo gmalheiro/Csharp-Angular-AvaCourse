@@ -179,13 +179,26 @@ namespace CursoAvanadeDotnetAngular.Controllers
         public IActionResult AlunosPorTurma(int IdTurma)
         {
 
-            return Ok((from alunos in _context.Alunos
-                       join turmas in _context.Turmas 
-                       on alunos.IdTurma equals turmas.Id
-                       select new DTO.AlunosTurma(){ 
-                           Nome = alunos.Nome, 
-                           Documento = alunos.Documento
-                       }).ToList());
+            var alunosTurma = (from alunos in _context.Alunos
+                               join turmas in _context.Turmas
+                               on alunos.IdTurma equals turmas.Id
+                               where turmas.Id == IdTurma
+                               select new DTO.AlunosTurma()
+                               {
+                                   Nome = alunos.Nome,
+                                   Documento = alunos.Documento,
+                                   NomeTurma = turmas.NomeTurma
+                               }).ToList();
+
+            if (alunosTurma.Count == 0)
+            {
+                return NotFound("Não foi possível encontrar alunos para a turma especificada.");
+            }
+
+            return Ok(alunosTurma);
+
+
+
         }
 
         [HttpGet]
