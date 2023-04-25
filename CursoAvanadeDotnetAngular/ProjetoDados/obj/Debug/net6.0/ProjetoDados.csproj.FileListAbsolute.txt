@@ -1,0 +1,14 @@
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\bin\Debug\net6.0\ProjetoDados.deps.json
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\bin\Debug\net6.0\ProjetoDados.runtimeconfig.json
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\bin\Debug\net6.0\ProjetoDados.dll
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\bin\Debug\net6.0\ProjetoDados.pdb
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.csproj.AssemblyReference.cache
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.AssemblyInfoInputs.cache
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.AssemblyInfo.cs
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.csproj.CoreCompileInputs.cache
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.dll
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\refint\ProjetoDados.dll
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.pdb
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ProjetoDados.genruntimeconfig.cache
+C:\Users\g.silva.malheiro\Documents\Programming\.NET\Project\CursoAvanade\CursoAvanadeDotnetAngular\ProjetoDados\obj\Debug\net6.0\ref\ProjetoDados.dll
