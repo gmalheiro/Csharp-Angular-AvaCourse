@@ -96,6 +96,80 @@ namespace CursoAvanadeDotnetAngular.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/[controller]/TurmaPorAluno/{IdAluno}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult TurmaPorAluno(int IdAluno)
+        {
+            try
+            {
+                Entidade.Turma TurmaEntidade =
+                    _context.Turmas
+                    
+                    .Join(_context.Alunos,
+                    turma => turma.Id,
+                    aluno => aluno.IdTurma,
+                    (turma,aluno)=> new { Turma = turma, Aluno = aluno})
+
+                    .Where(w => w.Aluno.Id == IdAluno)
+                    
+                    .Select(s => s.Turma)
+                    .FirstOrDefault();
+
+                if (TurmaEntidade == null)
+                {
+                    return NoContent();
+                }
+
+                DTO.Turma TurmaDTO = new DTO.Turma()
+                {
+                    Id = TurmaEntidade.Id,
+                    NomeTurma = TurmaEntidade.NomeTurma
+                };
+
+                return Ok(TurmaDTO);
+
+            }
+            catch(Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Route("/[controller]/TurmaPorAlunoComInclude/{IdAluno}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult TurmaPorAlunoComInclude(int IdAluno)
+        {
+            try
+            {
+                var TurmaEntidade = _context.Turmas.Include(blog => blog.Alunos)
+                    .Where(w => w.Id == IdAluno).FirstOrDefault(); 
+
+                if (TurmaEntidade == null)
+                {
+                    return NoContent();
+                }
+
+                DTO.Turma TurmaDTO = new DTO.Turma()
+                {
+                    Id = TurmaEntidade.Id,
+                    NomeTurma = TurmaEntidade.NomeTurma
+                };
+
+                return Ok(TurmaDTO);
+
+            }
+            catch (Exception)
+            {
+                return BadRequest();        
+            }
+        }
+
         [HttpPost]
         [Route("/Inserir")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTO.Turma))]
